@@ -1,3 +1,4 @@
+import http from "http";
 import { Client, GatewayIntentBits, Events, Message, GuildMember, EmbedBuilder, AttachmentBuilder } from "discord.js";
 import dotenv from "dotenv";
 import { welcomeImage } from "./utils/welcomeImage";
@@ -53,4 +54,37 @@ client.on(Events.GuildMemberAdd, async (member: GuildMember) => {
   }
 });
 
+client.on(Events.ShardDisconnect, (event, shardId) => {
+  console.log(`Shard ${shardId} disconnected. Attempting to reconnect...`);
+});
+
+client.on(Events.ShardReconnecting, shardId => {
+  console.log(`Shard ${shardId} is attempting to reconnect...`);
+});
+
+client.on(Events.ShardResume, (shardId, replayedEvents) => {
+  console.log(`Shard ${shardId} has resumed. Replayed ${replayedEvents} events.`);
+});
+
 client.login(discordToken);
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Bot is Running!!!");
+});
+
+process.on("uncaughtException", err => {
+  console.error("Uncaught Exception:", err);
+  client.login(process.env.DISCORD_TOKEN);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  client.login(process.env.DISCORD_TOKEN);
+});
+
+const Port = process.env.PORT || 8080;
+
+server.listen(Port, () => {
+  console.log(`Health check server running on port ${Port}`);
+});
