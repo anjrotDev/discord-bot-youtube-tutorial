@@ -14,10 +14,12 @@ client.once(Events.ClientReady, async () => {
   console.log(`Ready running bot ${client.user?.username}`);
 });
 
-client.once(Events.MessageCreate, async (message: Message) => {
+client.on(Events.MessageCreate, async (message: Message) => {
   if (message.content === "!hola") message.reply(`Hola ${message.author}, como estas?`);
 
   if (message.content === "!avatar") message.channel.send(message.author.displayAvatarURL({ size: 256, extension: "png" }));
+
+  if (message.content === "!changelog") message.reply("Changing the listener method to .on");
 });
 
 client.on(Events.GuildMemberAdd, async (member: GuildMember) => {
